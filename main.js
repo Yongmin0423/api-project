@@ -11,7 +11,7 @@ const getLatestNews = async () => {
   const url = new URL(
     //`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}` 기존
     //`http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines`
-    `https://noona-news-project1.netlify.app/`
+    `https://noona-news-project1.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
   );
   const response = await fetch(url);
   const data = await response.json();
