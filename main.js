@@ -1,33 +1,61 @@
 const API_KEY = `8b29827c21c24c2a90a7231a1761642c`;
 let newsList = [];
 const searchIcon = document.getElementById("search-icon");
-const searchInput = document.getElementById("search-input");
+const searchInput = document.getElementById("news-search");
+const menus = document.querySelectorAll(".menus button");
+const sideMenus = document.querySelectorAll(".sidenav button");
+const searchButton = document.querySelector(".search-input button");
+let url = new URL(
+  `https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+);
+
+const getNews = async () => {
+  const response = await fetch(url);
+  const data = await response.json();
+  newsList = data.articles;
+  render();
+};
+
+menus.forEach((menu) =>
+  menu.addEventListener("click", (event) => getNewsByCategory(event))
+);
+
+sideMenus.forEach((menu) =>
+  menu.addEventListener("click", (event) => getNewsByCategory(event))
+);
+
+searchButton.addEventListener("click", getSearchNews);
 
 function onHandleToggle() {
   document.querySelector(".search-input").classList.toggle("hidden");
 }
 
-const getLatestNews = async () => {
-  const url = new URL(
-    //`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}` 기존
-    //`http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines`
-    `https://noona-news-project1.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
+const getLatestNews = () => {
+  url = new URL(
+    //`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`
+    //`https://noona-news-project1.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
   );
-  const response = await fetch(url);
-  const data = await response.json();
-  newsList = data.articles;
-  render();
-  console.log("dddd", newsList);
+  getNews();
 };
 getLatestNews();
+const getNewsByCategory = (event) => {
+  const category = event.target.textContent.toLowerCase();
+  url = new URL(
+    //`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
+  );
+  getNews();
+};
 
-/* Set the width of the side navigation to 250px */
-function openNav() {
-  document.getElementById("mySidenav").style.width = "250px";
-}
-/* Set the width of the side navigation to 0 */
-function closeNav() {
-  document.getElementById("mySidenav").style.width = "0";
+async function getSearchNews(event) {
+  event.preventDefault();
+  const search = searchInput.value;
+  url = new URL(
+    //`https://newsapi.org/v2/top-headlines?country=kr&q=${search}&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${search}`
+  );
+  getNews();
 }
 
 const render = () => {
@@ -39,7 +67,6 @@ const render = () => {
       let newsImage = news.urlToImage;
       let source = news.source.name;
       let time = news.publishedAt;
-      console.log(time);
 
       if (descriptionText == null || descriptionText == "") {
         descriptionText = "내용없음";
@@ -73,3 +100,12 @@ const render = () => {
 
   document.getElementById("news-board").innerHTML = newsHTML;
 };
+
+/* Set the width of the side navigation to 250px */
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+/* Set the width of the side navigation to 0 */
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
