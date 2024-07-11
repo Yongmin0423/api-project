@@ -8,12 +8,31 @@ const searchButton = document.querySelector(".search-input button");
 let url = new URL(
   `https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
 );
+let totalResults = 0;
+let page = 1;
+const pageSize = 10;
+const groupSizes = 5;
 
 const getNews = async () => {
-  const response = await fetch(url);
-  const data = await response.json();
-  newsList = data.articles;
-  render();
+  try {
+    url.searchParams.set("page", page); //&page==page
+    url.searchParams.set("pageSize", pageSize);
+    const response = await fetch(url);
+    const data = await response.json();
+    if (response.status === 200) {
+      if (data.articles.length === 0) {
+        throw new Error("No result for this search");
+      }
+      newsList = data.articles;
+      totalResults = data.totalResults;
+      render();
+      paginationRender();
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    errorRender(error.message);
+  }
 };
 
 menus.forEach((menu) =>
@@ -32,18 +51,18 @@ function onHandleToggle() {
 
 const getLatestNews = () => {
   url = new URL(
-    //`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
-    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`
+    `https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`
     //`https://noona-news-project1.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
   );
   getNews();
 };
-getLatestNews();
+
 const getNewsByCategory = (event) => {
   const category = event.target.textContent.toLowerCase();
   url = new URL(
-    //`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
-    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
+    `https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
+    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
   );
   getNews();
 };
@@ -52,8 +71,8 @@ async function getSearchNews(event) {
   event.preventDefault();
   const search = searchInput.value;
   url = new URL(
-    //`https://newsapi.org/v2/top-headlines?country=kr&q=${search}&apiKey=${API_KEY}`
-    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${search}`
+    `https://newsapi.org/v2/top-headlines?country=kr&q=${search}&apiKey=${API_KEY}`
+    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${search}`
   );
   getNews();
 }
@@ -101,6 +120,14 @@ const render = () => {
   document.getElementById("news-board").innerHTML = newsHTML;
 };
 
+const errorRender = (errorMessage) => {
+  const errorHTML = `<div class="alert alert-danger" role="alert">
+  ${errorMessage}
+</div>`;
+
+  document.getElementById("news-board").innerHTML = errorHTML;
+};
+
 /* Set the width of the side navigation to 250px */
 function openNav() {
   document.getElementById("mySidenav").style.width = "250px";
@@ -109,3 +136,58 @@ function openNav() {
 function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
 }
+
+const paginationRender = () => {
+  const totalPages = Math.ceil(totalResults / pageSize);
+  const pageGroup = Math.ceil(page / groupSizes);
+  let lastPage = pageGroup * groupSizes;
+  //마지막 페이지 그룹이 그룹 사이즈보다 작다? lastpage = totalpage
+  if (lastPage > totalPages) {
+    lastPage = totalPages;
+  }
+
+  const firstPage =
+    lastPage - (groupSizes - 1) <= 0 ? 1 : lastPage - (groupSizes - 1);
+
+  let paginationHTML = `
+  <li class="page-item" onclick="moveToPage(${firstPage})">
+        <a class="page-link" href="#">
+          <<
+        </a>
+      </li>
+
+  <li class="page-item" onclick="moveToPage(${page - 1})">
+        <a class="page-link" href="#">
+          Previous
+        </a>
+      </li>`;
+
+  for (let i = firstPage; i <= lastPage; i++) {
+    paginationHTML += `<li class="page-item ${
+      i === page ? "active" : ""
+    }"  onclick="moveToPage(${i})">
+        <a class="page-link" href="#">
+          ${i}
+        </a>
+      </li>`;
+  }
+  paginationHTML += `<li class="page-item" onclick="moveToPage(${page + 1})">
+        <a class="page-link" href="#">
+          Next
+        </a>
+      </li>`;
+  paginationHTML += `<li class="page-item" onclick="moveToPage(${lastPage})">
+      <a class="page-link" href="#">
+        >>
+      </a>
+    </li>`;
+  document.querySelector(".pagination").innerHTML = paginationHTML;
+};
+
+const moveToPage = (pageNum) => {
+  page = pageNum;
+  getNews();
+};
+getLatestNews();
+
+//1. disabled 추가하기
