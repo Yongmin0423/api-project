@@ -51,8 +51,8 @@ function onHandleToggle() {
 
 const getLatestNews = () => {
   url = new URL(
-    `https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
-    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`
+    //`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`
     //`https://noona-news-project1.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
   );
   getNews();
@@ -61,8 +61,8 @@ const getLatestNews = () => {
 const getNewsByCategory = (event) => {
   const category = event.target.textContent.toLowerCase();
   url = new URL(
-    `https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
-    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
+    //`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
   );
   getNews();
 };
@@ -71,8 +71,8 @@ async function getSearchNews(event) {
   event.preventDefault();
   const search = searchInput.value;
   url = new URL(
-    `https://newsapi.org/v2/top-headlines?country=kr&q=${search}&apiKey=${API_KEY}`
-    //`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${search}`
+    //`https://newsapi.org/v2/top-headlines?country=kr&q=${search}&apiKey=${API_KEY}`
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${search}`
   );
   getNews();
 }
